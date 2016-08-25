@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<extension>
+    <id>billplz</id>
+    <version>3.0.0</version>
+    <type>payment</type>
+    <category>payment</category>
+    <cartversions>
+        <item>1.2</item>
+    </cartversions>
+    <layout></layout>
+    <priority>10</priority>
+    <settings>
+        <item id="billplz_account">
+            <type required="true">input</type>
+            <default_value></default_value>
+        </item>
+        <item id="billplz_secret">
+            <type required="true">input</type>
+            <default_value></default_value>
+        </item>
+        <item id="billplz_auto_submit">
+            <type required="true">selectbox</type>
+            <variants>
+                <item>fpx</item>
+                <item>paypal</item>
+                <item>billplz</item>
+            </variants>
+            <default_value>FPX</default_value>
+        </item>
+        <item id="billplz_sandbox">
+            <type required="true">selectbox</type>
+            <variants>
+                <item>https://www.billplz.com/api/v3/</item>
+                <item>https://billplz-staging.herokuapp.com/api/v3/</item>
+            </variants>
+            <default_value>https://www.billplz.com/api/v3/</default_value>
+        </item>
+        <item id="billplz_deliver">
+            <type required="true">selectbox</type>
+            <variants>
+                <item>false</item>
+                <item>true</item>
+            </variants>
+            <default_value>false</default_value>
+        </item>
+        <item id="billplz_order_status_id">
+            <type>selectbox</type>
+            <variants>
+                <data_source>
+                    <model_rt>localisation/order_status</model_rt>
+                    <method>getOrderStatuses</method>
+                </data_source>
+                <fields>
+                    <field>order_status_id</field>
+                    <field>name</field>
+                </fields>
+            </variants>
+            <default_value>2</default_value>
+        </item>
+        <item id="billplz_location_id">
+            <type>selectbox</type>
+            <variants>
+                <item>0</item>
+                <data_source>
+                       
+                    <model_rt>localisation/location</model_rt>
+                       
+                    <method>getLocations</method>
+                </data_source>
+                <fields>
+                    <field>location_id</field>
+                    <field>name</field>
+                </fields>
+            </variants>
+        </item>
+    </settings>
+</extension>

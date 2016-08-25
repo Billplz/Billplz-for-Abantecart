@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package>
+    <id>accessible_cart</id>
+    <type>extension</type>
+	<version>3.0.0</version>
+	<cartversions>		
+		<item>1.2</item>
+	</cartversions>
+	<package_content>
+		<extensions>
+			<extension>accessible_cart</extension>
+		</extensions>
+	</package_content>
+</package>
