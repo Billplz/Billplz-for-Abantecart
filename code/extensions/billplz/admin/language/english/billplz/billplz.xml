@@ -62,6 +62,10 @@
 		<value><![CDATA[No]]></value>
 	</definition>
         <definition>
+		<key>billplz_charges</key>
+		<value><![CDATA[Additional Charges:<br /><span class="help">Add extra charge (in RM) when customer pay using Billplz.</span>]]></value>
+	</definition>
+        <definition>
 		<key>billplz_order_status_id</key>
 		<value><![CDATA[Order Status:]]></value>
 	</definition>
