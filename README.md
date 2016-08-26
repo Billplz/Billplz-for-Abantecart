@@ -11,6 +11,7 @@ Accept payment using Billplz for Abantecart
 
 1. Auto Submit feature
 2. Delivery notification
+3. Additional Fixed Charge
 
 # Installation
 
