@@ -43,6 +43,10 @@
             </variants>
             <default_value>false</default_value>
         </item>
+        <item id="billplz_charges">
+            <type required="true">input</type>
+            <default_value>0.00</default_value>
+        </item>
         <item id="billplz_order_status_id">
             <type>selectbox</type>
             <variants>
