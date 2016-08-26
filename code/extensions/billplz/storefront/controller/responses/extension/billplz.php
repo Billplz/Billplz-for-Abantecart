@@ -33,6 +33,7 @@ class ControllerResponsesExtensionBillplz extends AController {
         $merchant_id = $this->config->get('billplz_account');
         $merchant_verify_key = $this->config->get('billplz_secret');
         $template_data['autosubmit'] = $this->config->get('billplz_auto_submit');
+        $billplz_charges = $this->config->get('billplz_charges');
 
         $total_amount = $this->currency->format($order_info['total'], $order_info['currency'], $order_info['value'], FALSE);
 
@@ -73,7 +74,7 @@ class ControllerResponsesExtensionBillplz extends AController {
         //number intelligence
 
         $billplz_data = array(
-            'amount' => $total_amount * 100,
+            'amount' => ($total_amount + $billplz_charges) * 100,
             'name' => $name,
             'email' => $order_info['email'],
             'mobile' => $custTel,
