@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <extension>
     <id>billplz</id>
-    <version>3.1.0</version>
+    <version>3.1.1</version>
     <type>payment</type>
     <category>payment</category>
     <cartversions>
