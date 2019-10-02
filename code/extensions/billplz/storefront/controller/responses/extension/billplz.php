@@ -260,6 +260,10 @@ class ControllerResponsesExtensionBillplz extends AController
             $this->redirect($this->html->getURL('index/home'));
         }
 
+        /* This class required for checking a bill */
+        require 'billplz_api.php';
+        require 'billplz_connect.php';
+
         try {
             $data = BillplzConnect::getXSignature($this->config->get('billplz_x_signature'));
         } catch (Exception $e) {
@@ -267,11 +271,8 @@ class ControllerResponsesExtensionBillplz extends AController
             exit($e->getMessage());
         }
 
-        /* This class required for creating a bill */
-        require 'billplz_api.php';
-        require 'billplz_connect.php';
-
         $connect = new BillplzConnect($this->config->get('billplz_api_key'));
+        $is_production = $this->config->get('billplz_env') == 'production' ? true : false;
         $connect->setMode($is_production);
 
         $billplz = new BillplzAPI($connect);
