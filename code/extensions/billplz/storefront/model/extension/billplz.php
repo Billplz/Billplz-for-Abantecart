@@ -4,9 +4,11 @@ if (!defined('DIR_CORE')) {
     header('Location: static_pages/');
 }
 
-class ModelExtensionBillplz extends Model {
+class ModelExtensionBillplz extends Model
+{
 
-    public function getMethod($address) {
+    public function getMethod($address)
+    {
         $this->load->language('billplz/billplz');
 
         if ($this->config->get('billplz_status')) {
@@ -17,14 +19,14 @@ class ModelExtensionBillplz extends Model {
 												AND (zone_id = '" . (int) $address['zone_id'] . "' OR zone_id = '0')");
 
             if (!$this->config->get('billplz_location_id')) {
-                $status = TRUE;
+                $status = true;
             } elseif ($query->num_rows) {
-                $status = TRUE;
+                $status = true;
             } else {
-                $status = FALSE;
+                $status = false;
             }
         } else {
-            $status = FALSE;
+            $status = false;
         }
 
         $method_data = array();
@@ -33,7 +35,7 @@ class ModelExtensionBillplz extends Model {
             $method_data = array(
                 'id' => 'billplz',
                 'title' => $this->language->get('text_title'),
-                'sort_order' => $this->config->get('billplz_sort_order')
+                'sort_order' => $this->config->get('billplz_sort_order'),
             );
         }
 
@@ -44,7 +46,8 @@ class ModelExtensionBillplz extends Model {
      * @param string $order_status_name
      * @return int
      */
-    public function getOrderStatusIdByName($order_status_name) {
+    public function getOrderStatusIdByName($order_status_name)
+    {
         $language_id = $this->language->getLanguageDetails('en');
         $language_id = $language_id['language_id'];
 

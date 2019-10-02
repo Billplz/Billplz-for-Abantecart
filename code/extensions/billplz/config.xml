@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <extension>
     <id>billplz</id>
-    <version>3.0.0</version>
+    <version>3.1.0</version>
     <type>payment</type>
     <category>payment</category>
     <cartversions>
@@ -10,38 +10,32 @@
     <layout></layout>
     <priority>10</priority>
     <settings>
-        <item id="billplz_account">
+        <item id="billplz_api_key">
             <type required="true">input</type>
             <default_value></default_value>
         </item>
-        <item id="billplz_secret">
+        <item id="billplz_collection_id">
             <type required="true">input</type>
             <default_value></default_value>
         </item>
-        <item id="billplz_auto_submit">
-            <type required="true">selectbox</type>
-            <variants>
-                <item>fpx</item>
-                <item>paypal</item>
-                <item>billplz</item>
-            </variants>
-            <default_value>FPX</default_value>
+        <item id="billplz_x_signature">
+            <type required="true">input</type>
+            <default_value></default_value>
         </item>
-        <item id="billplz_sandbox">
-            <type required="true">selectbox</type>
-            <variants>
-                <item>https://www.billplz.com/api/v3/</item>
-                <item>https://billplz-staging.herokuapp.com/api/v3/</item>
-            </variants>
-            <default_value>https://www.billplz.com/api/v3/</default_value>
-        </item>
-        <item id="billplz_deliver">
+        <item id="billplz_skip_bill_page">
             <type required="true">selectbox</type>
             <variants>
                 <item>false</item>
-                <item>true</item>
+                <!-- <item>true</item> -->
             </variants>
             <default_value>false</default_value>
+        </item>
+        <item id="billplz_env">
+            <type required="true">selectbox</type>
+            <variants>
+                <item>production</item>
+                <item>sandbox</item>
+            </variants>
         </item>
         <item id="billplz_charges">
             <type required="false">input</type>

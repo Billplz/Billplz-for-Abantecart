@@ -2,33 +2,25 @@
 
 Accept payment using Billplz for Abantecart
 
-# Compatibility
+## Compatibility
 
-- Abantecart 1.2.X
-- Tested with Abantecart 1.2.8
+- Abantecart 1.2.X (Tested up to 1.2.15)
+- PHP 7.x
 
-# Features
-
-1. Auto Submit feature
-2. Delivery notification
-3. Additional Fixed Charge
-
-# Installation
+## Installation
 
 1. Download this repository
 2. Upload & Extact the zip archive.
 3. Copy folder "extensions" folder to your Installation Directory
 4. Go to Abantecart Administration
 5. Navigate to Extensions >> Payments
-6. Install & Configure the relevant details
-7. Done!
+6. Install & Configure
+7. Done
 
-# Issues & Troubleshooting
+## Currency Conversion
 
-Please create an Issue or contact us via Facebook 
-- www.facebook.com/billplzplugin
+- Ensure that you have set Ringgit Malaysia with code `MYR` on your currencies.
 
-# Donate
+## Other
 
-Give us some donation to this project
-- www.wanzul.net/donate
+Facebook: [Billplz Dev Jam](https://www.facebook.com/groups/billplzdevjam/)

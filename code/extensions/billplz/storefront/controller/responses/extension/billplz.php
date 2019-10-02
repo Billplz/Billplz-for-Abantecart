@@ -1,15 +1,12 @@
 <?php
-
 /* ------------------------------------------------------------------------------
-  Billplz - Malaysia Online Payment Gateway
-  http://www.github.com/wzul
- * 
- * Fair & Simple Payment Gateway
- * 
- * Author: Wanzul Hosting Enterprise
- * Version: 1.0
-
-  ------------------------------------------------------------------------------ */
+ *
+ * Billplz
+ *
+ * Author: Billplz Sdn. Bhd.
+ * Version: 3.1.0
+ *
+------------------------------------------------------------------------------ */
 
 if (!defined('DIR_CORE')) {
     header('Location: static_pages/');
@@ -19,162 +16,215 @@ if (!defined('DIR_CORE')) {
  * @property ModelExtensionBillplz $model_extension_billplz
  * @property ModelCheckoutOrder $model_checkout_order
  */
-class ControllerResponsesExtensionBillplz extends AController {
+class ControllerResponsesExtensionBillplz extends AController
+{
+    public $data = array();
 
-    public function main() {
+    public function main()
+    {
         $this->loadLanguage('billplz/billplz');
-        $template_data['button_confirm'] = $this->language->get('button_confirm');
-        $template_data['button_back'] = $this->language->get('button_back');
+
+        if ($this->request->get['rt'] == 'checkout/guest_step_3') {
+            $back_url = $this->html->getSecureURL('checkout/guest_step_2', '&mode=edit', true);
+        } else {
+            $back_url = $this->html->getSecureURL('checkout/payment', '&mode=edit', true);
+        }
+
+        $this->data['text_skip_bill_page'] = $this->language->get('skip_bill_page');
+
+        $this->data['button_back'] = $this->html->buildElement(
+            array(
+                'type' => 'button',
+                'name' => 'back',
+                'text' => $this->language->get('button_back'),
+                'href' => $back_url,
+            ));
+
+        $skip_bill_page = $this->config->get('billplz_skip_bill_page') == 'true';
+
+        if ($skip_bill_page) {
+
+            /* This class required for getting list of banks */
+            require 'billplz_bankname.php';
+
+            $form = new AForm();
+            $form->setForm(array('form_name' => 'billplz'));
+            $this->data['form_open'] = $form->getFieldHtml(
+                array(
+                    'type' => 'form',
+                    'name' => 'billplz',
+                    'attr' => 'class = "form-horizontal"',
+                    'csrf' => true,
+                    'action' => $this->html->getSecureURL('r/extension/billplz/confirm'),
+                )
+            );
+            $this->data['billplz_skip_bill_page'] = $form->getFieldHtml(
+                array(
+                    'type' => 'selectbox',
+                    'name' => 'bank_code',
+                    'value' => '',
+                    'options' => BillplzBankname::get(),
+                    'style' => 'input-medium',
+                )
+            );
+            $this->data['button_confirm'] = $this->html->buildElement(
+                array(
+                    'type' => 'submit',
+                    'name' => $this->language->get('button_confirm'),
+                    'style' => 'button',
+                )
+            );
+            $this->view->batchAssign($this->data);
+            $this->processTemplate('responses/billplz_skip_bill_page.tpl');
+        } else {
+
+            $this->data['button_confirm'] = $this->html->buildElement(
+                array(
+                    'type' => 'submit',
+                    'name' => $this->language->get('button_confirm'),
+                    'style' => 'button',
+                    'href' => $this->html->getSecureURL('r/extension/billplz/confirm',
+                        '&csrfinstance=' . $this->csrftoken->setInstance()
+                        . '&csrftoken=' . $this->csrftoken->setToken()),
+                )
+            );
+            $this->view->batchAssign($this->data);
+            $this->processTemplate('responses/billplz.tpl');
+        }
+    }
+
+    public function confirm()
+    {
+        if (!$this->csrftoken->isTokenValid()) {
+            exit('Forbidden: invalid csrf-token');
+        }
+
+        $skip_bill_page = $this->config->get('billplz_skip_bill_page') == 'true';
+        $skip_bill_page = $this->request->is_POST() && $skip_bill_page && $_POST['bank_code'];
+
+        if ($skip_bill_page) {
+            /* This class required for getting list of banks */
+            require 'billplz_bankname.php';
+
+            $bank_name = BillplzBankName::get();
+            $bank_code = isset($bank_name[$_POST['bank_code']]) ? $_POST['bank_code'] : '';
+        }
 
         $this->load->model('checkout/order');
+        $order_id = $this->session->data['order_id'];
 
-        $order_info = $this->model_checkout_order->getOrder($this->session->data['order_id']);
+        $order_info = $this->model_checkout_order->getOrder($order_id);
 
-        $merchant_id = $this->config->get('billplz_account');
-        $merchant_verify_key = $this->config->get('billplz_secret');
-        $template_data['autosubmit'] = $this->config->get('billplz_auto_submit');
+        $description = '';
+        $products = $this->cart->getProducts();
+
+        foreach ($products as $product) {
+            $description .= $product['name'] . ' ' . $product['quantity'] . ' ';
+        }
+
+        $total_amount = $this->currency->format($order_info['total'], $order_info['currency'], $order_info['value'], false);
+
         $billplz_charges = $this->config->get('billplz_charges');
 
-        $total_amount = $this->currency->format($order_info['total'], $order_info['currency'], $order_info['value'], FALSE);
-
-        $template_data['order_number'] = $this->session->data['order_id'];
-        //$template_data['card_holder_name'] = $order_info['payment_firstname'] . ' ' . $order_info['payment_lastname'];
-        $template_data['deliver'] = $this->config->get('billplz_deliver');
-        $deliver = $template_data['deliver'] == 'true' ? true : false;
-        if ($order_info['shipping_lastname']) {
+        if ($order_info['payment_lastname']) {
+            $name = $order_info['payment_firstname'] . ' ' . $order_info['payment_lastname'];
+        } else if ($order_info['shipping_lastname']) {
             $name = $order_info['shipping_firstname'] . ' ' . $order_info['shipping_lastname'];
         } else {
             $name = $order_info['firstname'] . ' ' . $order_info['lastname'];
         }
 
-        $template_data['products'] = '';
-
-        $products = $this->cart->getProducts();
-
-        foreach ($products as $product) {
-            $template_data['products'] = $product['name'] . ' ' . $product['quantity'] . ' ';
-        }
-
-        $template_data['callback_url'] = $this->html->getSecureURL('extension/billplz/capture');
-        $template_data['return_url'] = $this->html->getSecureURL('extension/billplz/returnback');
-
-        //number intelligence
-        $custTel = $order_info['telephone'];
-        $custTel2 = substr($order_info['telephone'], 0, 1);
-        if ($custTel2 == '+') {
-            $custTel3 = substr($order_info['telephone'], 1, 1);
-            if ($custTel3 != '6')
-                $custTel = "+6" . $order_info['telephone'];
-        } else if ($custTel2 == '6') {
-            
+        if ($order_info['currency'] === 'MYR') {
+            $final_amount = $total_amount + $billplz_charges;
         } else {
-            if ($custTel != '')
-                $custTel = "+6" . $order_info['telephone'];
+            $final_amount = $this->model_checkout_order->currency->convert($total_amount + $billplz_charges, $order_info['currency'], 'MYR');
         }
-        //number intelligence
 
-        $billplz_data = array(
-            'amount' => ($total_amount + $billplz_charges) * 100,
-            'name' => $name,
+        $parameter = array(
+            'collection_id' => $this->config->get('billplz_collection_id'),
             'email' => $order_info['email'],
-            'mobile' => $custTel,
-            'collection_id' => $merchant_verify_key,
-            'deliver' => $deliver,
-            'description' => substr("Order " . $template_data['order_number'] . " - " . $template_data['products'], 0, 199),
-            'reference_1_label' => 'ID',
-            'reference_1' => $this->session->data['order_id'],
-            'redirect_url' => $template_data['return_url'],
-            'callback_url' => $template_data['callback_url'],
+            'mobile' => trim($order_info['telephone']),
+            'name' => empty($name) ? $order_info['email'] : $name,
+            'amount' => $final_amount * 100,
+            'callback_url' => $this->html->getSecureURL('extension/billplz/callback_url', '&order_id=' . $order_id),
+            'description' => mb_substr("Order " . $order_id . " - " . $description, 0, 199),
         );
 
-        $process = curl_init($this->config->get('billplz_sandbox') . 'bills/');
-        curl_setopt($process, CURLOPT_HEADER, 0);
-        curl_setopt($process, CURLOPT_USERPWD, $merchant_id . ":");
-        curl_setopt($process, CURLOPT_TIMEOUT, 30);
-        curl_setopt($process, CURLOPT_RETURNTRANSFER, TRUE);
-        curl_setopt($process, CURLOPT_POSTFIELDS, http_build_query($billplz_data));
-        $return = curl_exec($process);
-        curl_close($process);
-        $arr = json_decode($return, true);
-        $template_data['action'] = isset($arr['url']) ? $arr['url'] : null;
+        $optional = array(
+            'redirect_url' => $this->html->getSecureURL('extension/billplz/redirect_url', '&order_id=' . $order_id),
+            'reference_1_label' => $skip_bill_page ? 'Bank Code' : '',
+            'reference_1' => isset($bank_code) ? $bank_code : '',
+            'reference_2_label' => 'Order ID',
+            'reference_2' => $order_id,
+        );
 
-        if (isset($arr['error'])) {
-            unset($billplz_data['mobile']);
-            $process = curl_init($this->config->get('billplz_sandbox') . 'bills/');
-            curl_setopt($process, CURLOPT_HEADER, 0);
-            curl_setopt($process, CURLOPT_USERPWD, $merchant_id . ":");
-            curl_setopt($process, CURLOPT_TIMEOUT, 30);
-            curl_setopt($process, CURLOPT_RETURNTRANSFER, TRUE);
-            curl_setopt($process, CURLOPT_POSTFIELDS, http_build_query($billplz_data));
-            $return = curl_exec($process);
-            curl_close($process);
-            $arr = json_decode($return, true);
-            $template_data['action'] = isset($arr['url']) ? $arr['url'] : "http://facebook.com/billplzplugin";
+        $is_production = $this->config->get('billplz_env') == 'production' ? true : false;
+
+        /* This class required for creating a bill */
+        require 'billplz_api.php';
+        require 'billplz_connect.php';
+
+        $connect = new BillplzConnect($this->config->get('billplz_api_key'));
+        $connect->setMode($is_production);
+
+        $billplz = new BillplzAPI($connect);
+        list($rheader, $rbody) = $billplz->toArray($billplz->createBill($parameter, $optional));
+
+        if ($rheader !== 200) {
+            $order_status_id = $this->model_extension_billplz->getOrderStatusIdByName('Failed');
+            ADebug::error("Billplz_Create_A_Bill", $rheader, json_encode($rbody));
+            $this->model_checkout_order->confirm($order_id, $order_status_id, json_encode($rbody));
+        } else {
+            $order_status_id = $this->model_extension_billplz->getOrderStatusIdByName('Pending');
+            $order_message = 'Bill ID: ' . $rbody['id'] . '. Bill URL: ' . $rbody['url'];
+            $this->model_checkout_order->updatePaymentMethodData($order_id,
+                serialize($rbody));
+            $this->model_checkout_order->confirm($order_id, $order_status_id, $order_message);
+            redirect($rbody['url'] . ($skip_bill_page ? '?auto_submit=true' : ''));
         }
 
-        $this->view->batchAssign($template_data);
-        $this->processTemplate('responses/billplz.tpl');
     }
 
-    public function capture() {
-        if ($this->request->is_GET()) {
-            $this->redirect($this->html->getURL('index/home'));
-        }
-
-        $post = $this->request->post;
-
-        $verification2 = $post['id'];
-        $merchant_id = $this->config->get('billplz_account');
-
-        $process = curl_init($this->config->get('billplz_sandbox') . "bills/" . $verification2);
-        curl_setopt($process, CURLOPT_HEADER, 0);
-        curl_setopt($process, CURLOPT_USERPWD, $merchant_id . ":");
-        curl_setopt($process, CURLOPT_TIMEOUT, 30);
-        curl_setopt($process, CURLOPT_RETURNTRANSFER, TRUE);
-        $return = curl_exec($process);
-        curl_close($process);
-        $arra = json_decode($return, true);
-        $orderid = $arra['reference_1'];
-        if ($arra['collection_id'] != $post['collection_id']) {
+    public function redirect_url()
+    {
+        if (!$this->request->is_GET()) {
             exit;
         }
 
-        $this->load->model('checkout/order');
-        $this->load->model('extension/billplz');
+        /* This class required for checking a bill */
+        require 'billplz_api.php';
+        require 'billplz_connect.php';
 
-
-
-        if ($arra['paid']) { // Success
-            $this->model_checkout_order->confirm((int) $orderid, $this->config->get('billplz_order_status_id'));
-        } else { // Failed
-            $order_status_id = $this->model_extension_billplz->getOrderStatusIdByName('Failed');
-            $this->model_checkout_order->update((int) $orderid, $order_status_id);
+        try {
+            $data = BillplzConnect::getXSignature($this->config->get('billplz_x_signature'));
+        } catch (Exception $e) {
+            status_header(403);
+            exit($e->getMessage());
         }
-    }
 
-    public function returnback() {
+        $connect = new BillplzConnect($this->config->get('billplz_api_key'));
+        $is_production = $this->config->get('billplz_env') == 'production' ? true : false;
+        $connect->setMode($is_production);
 
-        $get = $this->request->get;
+        $billplz = new BillplzAPI($connect);
+        list($rheader, $rbody) = $billplz->toArray($billplz->getBill($data['id']));
 
-        $verification2 = $get['billplz']['id'];
-        $merchant_id = $this->config->get('billplz_account');
+        if ($rbody['reference_2'] != $_GET['order_id']) {
+            exit('Invalid Order ID');
+        }
 
-        $process = curl_init($this->config->get('billplz_sandbox') . "bills/" . $verification2);
-        curl_setopt($process, CURLOPT_HEADER, 0);
-        curl_setopt($process, CURLOPT_USERPWD, $merchant_id . ":");
-        curl_setopt($process, CURLOPT_TIMEOUT, 30);
-        curl_setopt($process, CURLOPT_RETURNTRANSFER, TRUE);
-        $return = curl_exec($process);
-        curl_close($process);
-        $arra = json_decode($return, true);
+        $order_id = (int) $rbody['reference_2'];
 
-        $orderid = $arra['reference_1'];
         $this->load->model('checkout/order');
         $this->load->model('extension/billplz');
-        if (!$this->customer->isLogged()) {
-            // get order info
-            $order_info = $this->model_checkout_order->getOrder($orderid);
 
+        $order_info = $this->model_checkout_order->getOrder($order_id);
+        $old_rbody = unserialize($order_info['payment_method_data']);
+        if ($old_rbody['id'] != $data['id']) {
+            exit('Invalid Bill ID');
+        }
+
+        if (!$this->customer->isLogged()) {
             $this->session->data['guest']['firstname'] = $order_info['payment_firstname'];
             $this->session->data['guest']['lastname'] = $order_info['payment_lastname'];
             $this->session->data['guest']['email'] = $order_info['email'];
@@ -186,17 +236,73 @@ class ControllerResponsesExtensionBillplz extends AController {
             $this->session->data['guest']['zone'] = $order_info['payment_zone'];
         }
 
-        if ($arra['paid']) { // Success
+        $billplz_order_status_id = $this->config->get('billplz_order_status_id');
+        $notify_customer = $billplz_order_status_id != $order_info['order_status_id'];
+        $order_message = '(Redirect) Bill ID: ' . $rbody['id'] . '. Bill URL: ' . $rbody['url'] . '. State: ' . $rbody['state'];
+
+        if ($rbody['paid']) {
+            $this->model_checkout_order->update($order_id, $this->config->get('billplz_order_status_id'), $order_message, $notify_customer);
             if ($this->customer->isLogged()) {
-                $this->model_checkout_order->confirm((int) $orderid, $this->config->get('billplz_order_status_id'));
                 $this->redirect($this->html->getSecureURL('checkout/confirm'));
             } else {
                 $this->redirect($this->html->getSecureURL('checkout/success'));
             }
-        } else { // Failed
-            $order_status_id = $this->model_extension_billplz->getOrderStatusIdByName('Failed');
-            $this->model_checkout_order->update((int) $orderid, $order_status_id);
+        } else {
+            $order_status_id = $this->model_extension_billplz->getOrderStatusIdByName('Pending');
+            $this->model_checkout_order->update($order_id, $order_status_id, $order_message);
             $this->redirect($this->html->getSecureURL('checkout/cart'));
+        }
+    }
+
+    public function callback_url()
+    {
+        if (!$this->request->is_POST()) {
+            $this->redirect($this->html->getURL('index/home'));
+        }
+
+        try {
+            $data = BillplzConnect::getXSignature($this->config->get('billplz_x_signature'));
+        } catch (Exception $e) {
+            status_header(403);
+            exit($e->getMessage());
+        }
+
+        /* This class required for creating a bill */
+        require 'billplz_api.php';
+        require 'billplz_connect.php';
+
+        $connect = new BillplzConnect($this->config->get('billplz_api_key'));
+        $connect->setMode($is_production);
+
+        $billplz = new BillplzAPI($connect);
+        list($rheader, $rbody) = $billplz->toArray($billplz->getBill($data['id']));
+
+        if ($rbody['reference_2'] != $_GET['order_id']) {
+            status_header(403);
+            throw new \Exception('Invalid Order ID');
+        }
+
+        $order_id = (int) $rbody['reference_2'];
+
+        $this->load->model('checkout/order');
+        $this->load->model('extension/billplz');
+
+        $order_info = $this->model_checkout_order->getOrder($order_id);
+
+        $old_rbody = unserialize($order_info['payment_method_data']);
+        if ($old_rbody['id'] != $data['id']) {
+            exit('Invalid Bill ID');
+        }
+
+        $billplz_order_status_id = $this->config->get('billplz_order_status_id');
+        $notify_customer = $billplz_order_status_id != $order_info['order_status_id'];
+        $order_message = '(Callback) Bill ID: ' . $rbody['id'] . '. Bill URL: ' . $rbody['url'] . '. State: ' . $rbody['state'];
+
+        if ($rbody['paid']) {
+            $this->model_checkout_order->update($order_id, $billplz_order_status_id, $order_message, $notify_customer);
+        } else {
+            $order_status_id = $this->model_extension_billplz->getOrderStatusIdByName('Failed');
+            $this->model_checkout_order->confirm($order_id, $order_status_id, $order_message);
         }
     }
 

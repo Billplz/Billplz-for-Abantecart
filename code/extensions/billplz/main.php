@@ -6,13 +6,15 @@ if (!defined('DIR_CORE')) {
 
 $controllers = array(
     'storefront' => array(
-        'responses/extension/billplz'
-        ),
+        'responses/extension/billplz',
+    ),
     'admin' => array(),
 );
 
 $models = array(
-    'storefront' => array('extension/billplz'),
+    'storefront' => array(
+        'extension/billplz',
+    ),
     'admin' => array(),
 );
 
