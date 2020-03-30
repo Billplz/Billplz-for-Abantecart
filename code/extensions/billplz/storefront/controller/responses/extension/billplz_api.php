@@ -36,7 +36,7 @@ class BillplzAPI
         return false;
     }
 
-    public function getCollectionIndex(array $parameter = array())
+    public function getCollectionIndex($parameter = array())
     {
         $response = $this->connect->getCollectionIndex($parameter);
         if ($detect_mode = $this->detectMode(__FUNCTION__, $response, $parameter)) {
@@ -45,7 +45,7 @@ class BillplzAPI
         return $response;
     }
 
-    public function createCollection(string $parameter, array $optional = array())
+    public function createCollection($parameter, $optional = array())
     {
         $response = $this->connect->createCollection($parameter, $optional);
         if ($detect_mode = $this->detectMode(__FUNCTION__, $response, $parameter, $optional)) {
@@ -54,7 +54,7 @@ class BillplzAPI
         return $response;
     }
 
-    public function getCollection(string $parameter)
+    public function getCollection($parameter)
     {
         $response = $this->connect->getCollection($parameter);
         if ($detect_mode = $this->detectMode(__FUNCTION__, $response, $parameter)) {
@@ -63,7 +63,7 @@ class BillplzAPI
         return $response;
     }
 
-    public function createOpenCollection(array $parameter, array $optional = array())
+    public function createOpenCollection($parameter, $optional = array())
     {
         $parameter['title'] = substr($parameter['title'], 0, 49);
         $parameter['description'] = substr($parameter['description'], 0, 199);
@@ -79,7 +79,7 @@ class BillplzAPI
         return $response;
     }
 
-    public function getOpenCollection(string $parameter)
+    public function getOpenCollection($parameter)
     {
         $response = $this->connect->getOpenCollection($parameter);
         if ($detect_mode = $this->detectMode(__FUNCTION__, $response, $parameter)) {
@@ -88,7 +88,7 @@ class BillplzAPI
         return $response;
     }
 
-    public function getOpenCollectionIndex(array $parameter = array())
+    public function getOpenCollectionIndex($parameter = array())
     {
         $response = $this->connect->getOpenCollectionIndex($parameter);
         if ($detect_mode = $this->detectMode(__FUNCTION__, $response, $parameter)) {
@@ -97,7 +97,7 @@ class BillplzAPI
         return $response;
     }
 
-    public function createMPICollection(string $parameter)
+    public function createMPICollection($parameter)
     {
         $response = $this->connect->createMPICollection($parameter);
         if ($detect_mode = $this->detectMode(__FUNCTION__, $response, $parameter)) {
@@ -106,7 +106,7 @@ class BillplzAPI
         return $response;
     }
 
-    public function getMPICollection(string $parameter)
+    public function getMPICollection($parameter)
     {
         $response = $this->connect->getMPICollection($parameter);
         if ($detect_mode = $this->detectMode(__FUNCTION__, $response, $parameter)) {
@@ -115,7 +115,7 @@ class BillplzAPI
         return $response;
     }
 
-    public function createMPI(array $parameter, array $optional = array())
+    public function createMPI($parameter, $optional = array())
     {
         $response = $this->connect->createMPI($parameter, $optional);
         if ($detect_mode = $this->detectMode(__FUNCTION__, $response, $parameter, $optional)) {
@@ -124,7 +124,7 @@ class BillplzAPI
         return $response;
     }
 
-    public function getMPI(string $parameter)
+    public function getMPI($parameter)
     {
         $response = $this->connect->getMPI($parameter);
         if ($detect_mode = $this->detectMode(__FUNCTION__, $response, $parameter)) {
@@ -133,7 +133,7 @@ class BillplzAPI
         return $response;
     }
 
-    public function deactivateCollection(string $parameter)
+    public function deactivateCollection($parameter)
     {
         $response = $this->connect->deactivateCollection($parameter);
         if ($detect_mode = $this->detectMode(__FUNCTION__, $response, $parameter)) {
@@ -142,7 +142,7 @@ class BillplzAPI
         return $response;
     }
 
-    public function activateCollection(string $parameter)
+    public function activateCollection($parameter)
     {
         $response = $this->connect->deactivateCollection($parameter, 'activate');
         if ($detect_mode = $this->detectMode(__FUNCTION__, $response, $parameter)) {
@@ -151,7 +151,7 @@ class BillplzAPI
         return $response;
     }
 
-    public function createBill(array $parameter, array $optional = array(), string $sendCopy = '')
+    public function createBill($parameter, $optional = array(), $sendCopy = '')
     {
         /* Email or Mobile must be set */
         if (empty($parameter['email']) && empty($parameter['mobile'])) {
@@ -232,7 +232,7 @@ class BillplzAPI
         return $this->connect->createBill($parameter, $optional);
     }
 
-    public function deleteBill(string $parameter)
+    public function deleteBill($parameter)
     {
         $response = $this->connect->deleteBill($parameter);
         if ($detect_mode = $this->detectMode(__FUNCTION__, $response, $parameter)) {
@@ -241,7 +241,7 @@ class BillplzAPI
         return $response;
     }
 
-    public function getBill(string $parameter)
+    public function getBill($parameter)
     {
         $response = $this->connect->getBill($parameter);
         if ($detect_mode = $this->detectMode(__FUNCTION__, $response, $parameter)) {
@@ -250,7 +250,7 @@ class BillplzAPI
         return $response;
     }
 
-    public function bankAccountCheck(string $parameter)
+    public function bankAccountCheck($parameter)
     {
         $response = $this->connect->bankAccountCheck($parameter);
         if ($detect_mode = $this->detectMode(__FUNCTION__, $response, $parameter)) {
@@ -259,7 +259,7 @@ class BillplzAPI
         return $response;
     }
 
-    public function getTransactionIndex(string $id, array $parameter = array('page' => '1'))
+    public function getTransactionIndex($id, $parameter = array('page' => '1'))
     {
         $response = $this->connect->getTransactionIndex($id, $parameter);
         if ($detect_mode = $this->detectMode(__FUNCTION__, $response, $id, $parameter)) {
@@ -268,7 +268,7 @@ class BillplzAPI
         return $response;
     }
 
-    public function getPaymentMethodIndex(string $parameter)
+    public function getPaymentMethodIndex($parameter)
     {
         $response = $this->connect->getPaymentMethodIndex($parameter);
         if ($detect_mode = $this->detectMode(__FUNCTION__, $response, $parameter)) {
@@ -277,7 +277,7 @@ class BillplzAPI
         return $response;
     }
 
-    public function updatePaymentMethod(array $parameter)
+    public function updatePaymentMethod($parameter)
     {
         $response = $this->connect->updatePaymentMethod($parameter);
         if ($detect_mode = $this->detectMode(__FUNCTION__, $response, $parameter)) {
@@ -286,7 +286,7 @@ class BillplzAPI
         return $response;
     }
 
-    public function getBankAccountIndex(array $parameter = array('account_numbers' => ['0', '1']))
+    public function getBankAccountIndex($parameter = array('account_numbers' => ['0', '1']))
     {
         $response = $this->connect->getBankAccountIndex($parameter);
         if ($detect_mode = $this->detectMode(__FUNCTION__, $response, $parameter)) {
@@ -295,7 +295,7 @@ class BillplzAPI
         return $response;
     }
 
-    public function getBankAccount(string $parameter)
+    public function getBankAccount($parameter)
     {
         $response = $this->connect->getBankAccount($parameter);
         if ($detect_mode = $this->detectMode(__FUNCTION__, $response, $parameter)) {
@@ -304,7 +304,7 @@ class BillplzAPI
         return $response;
     }
 
-    public function createBankAccount(array $parameter)
+    public function createBankAccount($parameter)
     {
         $response = $this->connect->createBankAccount($parameter);
         if ($detect_mode = $this->detectMode(__FUNCTION__, $response, $parameter)) {
@@ -313,7 +313,7 @@ class BillplzAPI
         return $response;
     }
 
-    public function bypassBillplzPage(string $bill)
+    public function bypassBillplzPage($bill)
     {
         $bills = \json_decode($bill, true);
         if ($bills['reference_1_label'] !== 'Bank Code') {
@@ -352,7 +352,7 @@ class BillplzAPI
         return $response;
     }
 
-    public function toArray(array $json)
+    public function toArray($json)
     {
         return $this->connect->toArray($json);
     }
