@@ -18,7 +18,7 @@ class BillplzConnect
     const PRODUCTION_URL = 'https://www.billplz.com/api/';
     const STAGING_URL = 'https://www.billplz-sandbox.com/api/';
 
-    public function __construct(string $api_key)
+    public function __construct($api_key)
     {
         $this->api_key = $api_key;
 
@@ -40,7 +40,7 @@ class BillplzConnect
         }
     }
 
-    public function setMode(bool $is_production = false)
+    public function setMode($is_production = false)
     {
         $this->is_production = $is_production;
         if ($is_production) {
@@ -73,7 +73,7 @@ class BillplzConnect
         return $return;
     }
 
-    public function getCollectionIndex(array $parameter = array())
+    public function getCollectionIndex($parameter = array())
     {
         $url = $this->url . 'v4/collections?' . http_build_query($parameter);
 
@@ -89,7 +89,7 @@ class BillplzConnect
         return $return;
     }
 
-    public function createCollection(string $title, array $optional = array())
+    public function createCollection($title, $optional = array())
     {
         $url = $this->url . 'v4/collections';
 
@@ -128,7 +128,7 @@ class BillplzConnect
         return $return;
     }
 
-    public function createOpenCollection(array $parameter, array $optional = array())
+    public function createOpenCollection($parameter, $optional = array())
     {
         $url = $this->url . 'v4/open_collections';
 
@@ -172,7 +172,7 @@ class BillplzConnect
         return $return;
     }
 
-    public function getCollection(string $id)
+    public function getCollection($id)
     {
         $url = $this->url . 'v4/collections/' . $id;
 
@@ -189,7 +189,7 @@ class BillplzConnect
         return $return;
     }
 
-    public function getOpenCollection(string $id)
+    public function getOpenCollection($id)
     {
         $url = $this->url . 'v4/open_collections/' . $id;
         if ($this->process instanceof \GuzzleHttp\Client) {
@@ -205,7 +205,7 @@ class BillplzConnect
         return $return;
     }
 
-    public function getOpenCollectionIndex(array $parameter = array())
+    public function getOpenCollectionIndex($parameter = array())
     {
         $url = $this->url . 'v4/open_collections?' . http_build_query($parameter);
 
@@ -221,7 +221,7 @@ class BillplzConnect
         return $return;
     }
 
-    public function createMPICollection(string $title)
+    public function createMPICollection($title)
     {
         $url = $this->url . 'v4/mass_payment_instruction_collections';
 
@@ -242,7 +242,7 @@ class BillplzConnect
         return $return;
     }
 
-    public function getMPICollection(string $id)
+    public function getMPICollection($id)
     {
         $url = $this->url . 'v4/mass_payment_instruction_collections/' . $id;
         if ($this->process instanceof \GuzzleHttp\Client) {
@@ -258,7 +258,7 @@ class BillplzConnect
         return $return;
     }
 
-    public function createMPI(array $parameter, array $optional = array())
+    public function createMPI($parameter, $optional = array())
     {
         $url = $this->url . 'v4/mass_payment_instructions';
 
@@ -283,7 +283,7 @@ class BillplzConnect
         return $return;
     }
 
-    public function getMPI(string $id)
+    public function getMPI($id)
     {
         $url = $this->url . 'v4/mass_payment_instructions/' . $id;
         if ($this->process instanceof \GuzzleHttp\Client) {
@@ -299,7 +299,7 @@ class BillplzConnect
         return $return;
     }
 
-    public static function getXSignature(string $x_signature_key)
+    public static function getXSignature($x_signature_key)
     {
         $signingString = '';
 
@@ -360,7 +360,7 @@ class BillplzConnect
         throw new \Exception('X Signature Calculation Mismatch!');
     }
 
-    public function deactivateCollection(string $title, string $option = 'deactivate')
+    public function deactivateCollection($title, $option = 'deactivate')
     {
         $url = $this->url . 'v3/collections/' . $title . '/' . $option;
 
@@ -382,7 +382,7 @@ class BillplzConnect
         return $return;
     }
 
-    public function createBill(array $parameter, array $optional = array())
+    public function createBill($parameter, $optional = array())
     {
         $url = $this->url . 'v3/bills';
 
@@ -407,7 +407,7 @@ class BillplzConnect
         return $return;
     }
 
-    public function getBill(string $id)
+    public function getBill($id)
     {
         $url = $this->url . 'v3/bills/' . $id;
 
@@ -426,7 +426,7 @@ class BillplzConnect
         return $return;
     }
 
-    public function deleteBill(string $id)
+    public function deleteBill($id)
     {
         $url = $this->url . 'v3/bills/' . $id;
 
@@ -445,7 +445,7 @@ class BillplzConnect
         return $return;
     }
 
-    public function bankAccountCheck(string $id)
+    public function bankAccountCheck($id)
     {
         $url = $this->url . 'v3/check/bank_account_number/' . $id;
         if ($this->process instanceof \GuzzleHttp\Client) {
@@ -461,7 +461,7 @@ class BillplzConnect
         return $return;
     }
 
-    public function getPaymentMethodIndex(string $id)
+    public function getPaymentMethodIndex($id)
     {
         $url = $this->url . 'v3/collections/' . $id . '/payment_methods';
         if ($this->process instanceof \GuzzleHttp\Client) {
@@ -477,7 +477,7 @@ class BillplzConnect
         return $return;
     }
 
-    public function getTransactionIndex(string $id, array $parameter)
+    public function getTransactionIndex($id, $parameter)
     {
         $url = $this->url . 'v3/bills/' . $id . '/transactions?' . http_build_query($parameter);
 
@@ -494,7 +494,7 @@ class BillplzConnect
         return $return;
     }
 
-    public function updatePaymentMethod(array $parameter)
+    public function updatePaymentMethod($parameter)
     {
         if (!isset($parameter['collection_id'])) {
             throw new \Exception('Collection ID is not passed on updatePaymethodMethod');
@@ -526,7 +526,7 @@ class BillplzConnect
         return $return;
     }
 
-    public function getBankAccountIndex(array $parameter)
+    public function getBankAccountIndex($parameter)
     {
         if (!is_array($parameter['account_numbers'])) {
             throw new \Exception('Not valid account numbers.');
@@ -550,7 +550,7 @@ class BillplzConnect
         return $return;
     }
 
-    public function getBankAccount(string $id)
+    public function getBankAccount($id)
     {
         $url = $this->url . 'v3/bank_verification_services/' . $id;
         if ($this->process instanceof \GuzzleHttp\Client) {
@@ -566,7 +566,7 @@ class BillplzConnect
         return $return;
     }
 
-    public function createBankAccount(array $parameter)
+    public function createBankAccount($parameter)
     {
         $url = $this->url . 'v3/bank_verification_services';
 
@@ -621,7 +621,7 @@ class BillplzConnect
         }
     }
 
-    public function toArray(array $json)
+    public function toArray($json)
     {
         return array($json[0], \json_decode($json[1], true));
     }
