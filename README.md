@@ -4,7 +4,7 @@ Accept payment using Billplz for Abantecart
 
 ## Compatibility
 
-- Abantecart 1.2.X (Tested up to 1.2.15)
+- Abantecart 1.3.X (Tested up to 1.3.3)
 - PHP 7.x
 
 ## Installation
