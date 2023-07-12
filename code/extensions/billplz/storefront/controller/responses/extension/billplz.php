@@ -158,14 +158,14 @@ class ControllerResponsesExtensionBillplz extends AController
             'reference_2' => $order_id,
         );
 
-        $is_production = $this->config->get('billplz_env') == 'production' ? true : false;
+        $is_sandbox = $this->config->get('billplz_env') == 'sandbox' ? true : false;
 
         /* This class required for creating a bill */
         require 'billplz_api.php';
         require 'billplz_connect.php';
 
         $connect = new BillplzConnect($this->config->get('billplz_api_key'));
-        $connect->setMode($is_production);
+        $connect->setStaging($is_sandbox);
 
         $billplz = new BillplzAPI($connect);
         list($rheader, $rbody) = $billplz->toArray($billplz->createBill($parameter, $optional));
@@ -203,8 +203,8 @@ class ControllerResponsesExtensionBillplz extends AController
         }
 
         $connect = new BillplzConnect($this->config->get('billplz_api_key'));
-        $is_production = $this->config->get('billplz_env') == 'production' ? true : false;
-        $connect->setMode($is_production);
+        $is_sandbox = $this->config->get('billplz_env') == 'sandbox' ? true : false;
+        $connect->setStaging($is_sandbox);
 
         $billplz = new BillplzAPI($connect);
         list($rheader, $rbody) = $billplz->toArray($billplz->getBill($data['id']));
@@ -272,8 +272,8 @@ class ControllerResponsesExtensionBillplz extends AController
         }
 
         $connect = new BillplzConnect($this->config->get('billplz_api_key'));
-        $is_production = $this->config->get('billplz_env') == 'production' ? true : false;
-        $connect->setMode($is_production);
+        $is_sandbox = $this->config->get('billplz_env') == 'sandbox' ? true : false;
+        $connect->setStaging($is_sandbox);
 
         $billplz = new BillplzAPI($connect);
         list($rheader, $rbody) = $billplz->toArray($billplz->getBill($data['id']));
