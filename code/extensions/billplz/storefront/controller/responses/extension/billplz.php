@@ -164,11 +164,15 @@ class ControllerResponsesExtensionBillplz extends AController
         require 'billplz_api.php';
         require 'billplz_connect.php';
 
-        $connect = new BillplzConnect($this->config->get('billplz_api_key'));
-        $connect->setStaging($is_sandbox);
+        try {
+            $connect = new BillplzConnect($this->config->get('billplz_api_key'));
+            $connect->setStaging($is_sandbox);
 
-        $billplz = new BillplzAPI($connect);
-        list($rheader, $rbody) = $billplz->toArray($billplz->createBill($parameter, $optional));
+            $billplz = new BillplzAPI($connect);
+            list($rheader, $rbody) = $billplz->toArray($billplz->createBill($parameter, $optional));
+        } catch (Exception $e) {
+            exit($e->getMessage());
+        }
 
         if ($rheader !== 200) {
             $order_status_id = $this->model_extension_billplz->getOrderStatusIdByName('Failed');
