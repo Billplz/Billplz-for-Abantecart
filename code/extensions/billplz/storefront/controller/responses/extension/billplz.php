@@ -4,7 +4,7 @@
  * Billplz
  *
  * Author: Billplz Sdn. Bhd.
- * Version: 3.1.1
+ * Version: 3.1.2
  *
 ------------------------------------------------------------------------------ */
 
@@ -158,17 +158,21 @@ class ControllerResponsesExtensionBillplz extends AController
             'reference_2' => $order_id,
         );
 
-        $is_production = $this->config->get('billplz_env') == 'production' ? true : false;
+        $is_sandbox = $this->config->get('billplz_env') == 'sandbox' ? true : false;
 
         /* This class required for creating a bill */
         require 'billplz_api.php';
         require 'billplz_connect.php';
 
-        $connect = new BillplzConnect($this->config->get('billplz_api_key'));
-        $connect->setMode($is_production);
+        try {
+            $connect = new BillplzConnect($this->config->get('billplz_api_key'));
+            $connect->setStaging($is_sandbox);
 
-        $billplz = new BillplzAPI($connect);
-        list($rheader, $rbody) = $billplz->toArray($billplz->createBill($parameter, $optional));
+            $billplz = new BillplzAPI($connect);
+            list($rheader, $rbody) = $billplz->toArray($billplz->createBill($parameter, $optional));
+        } catch (Exception $e) {
+            exit($e->getMessage());
+        }
 
         if ($rheader !== 200) {
             $order_status_id = $this->model_extension_billplz->getOrderStatusIdByName('Failed');
@@ -203,8 +207,8 @@ class ControllerResponsesExtensionBillplz extends AController
         }
 
         $connect = new BillplzConnect($this->config->get('billplz_api_key'));
-        $is_production = $this->config->get('billplz_env') == 'production' ? true : false;
-        $connect->setMode($is_production);
+        $is_sandbox = $this->config->get('billplz_env') == 'sandbox' ? true : false;
+        $connect->setStaging($is_sandbox);
 
         $billplz = new BillplzAPI($connect);
         list($rheader, $rbody) = $billplz->toArray($billplz->getBill($data['id']));
@@ -272,8 +276,8 @@ class ControllerResponsesExtensionBillplz extends AController
         }
 
         $connect = new BillplzConnect($this->config->get('billplz_api_key'));
-        $is_production = $this->config->get('billplz_env') == 'production' ? true : false;
-        $connect->setMode($is_production);
+        $is_sandbox = $this->config->get('billplz_env') == 'sandbox' ? true : false;
+        $connect->setStaging($is_sandbox);
 
         $billplz = new BillplzAPI($connect);
         list($rheader, $rbody) = $billplz->toArray($billplz->getBill($data['id']));
